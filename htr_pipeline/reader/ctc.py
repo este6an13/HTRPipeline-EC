@@ -101,16 +101,19 @@ def ctc_single_word_beam_search(predictions: np.ndarray,
                 next_chars = prefix_tree.get_next_chars(beam.text)
                 for c in next_chars:
                     # extend current beam with new character
-                    label_idx = chars.index(c) + 1
-                    if beam.text != '' and beam.text[-1] == c:
-                        # same chars must be separated by blank
-                        pr_non_blank = predictions[time_idx, batch_idx, label_idx] * beam.prob_blank
-                    else:
-                        # different chars can be neighbours
-                        pr_non_blank = predictions[time_idx, batch_idx, label_idx] * beam.prob_total
+                    try:
+                        label_idx = chars.index(c) + 1
+                        if beam.text != '' and beam.text[-1] == c:
+                            # same chars must be separated by blank
+                            pr_non_blank = predictions[time_idx, batch_idx, label_idx] * beam.prob_blank
+                        else:
+                            # different chars can be neighbours
+                            pr_non_blank = predictions[time_idx, batch_idx, label_idx] * beam.prob_total
 
-                        # save result
-                    curr.append(Beam(beam.text + c, 0, pr_non_blank))
+                            # save result
+                        curr.append(Beam(beam.text + c, 0, pr_non_blank))
+                    except:
+                        pass
 
             # move current beams to next time-step
             prev = curr
